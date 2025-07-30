@@ -4,7 +4,7 @@ import API from "../api";
 
 function LoginPage() {
     const [name, setName] = useState("");
-    const [password, setPassword] = use("");
+    const [password, setPassword] = useState("");
     const navigate = useNavigate();
 
     const login = async () => {
