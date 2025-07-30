@@ -13,7 +13,7 @@ router.post("/", async (req, res) => {
         "INSERT INTO groups (name, password) VALUES ($1, $2) RETURNING id",
         [name, hash]
     );
-    req.json({ groupId: result.rows[0].id });
+    res.json({ groupId: result.rows[0].id });
 });
 
 // Login grupo
@@ -24,7 +24,7 @@ router.post("/login", async (req, res) => {
     if (!group) return res.status(404).json({ error: "Grupo não encontrado" });
 
     const match = await bcrypt.compare(password, group.password);
-    if (!match) return res.status(401), json({ error: "Senha incorreta" });
+    if (!match) return res.status(401).json({ error: "Senha incorreta" });
 
     const token = jwt.sign({ groupId: group.id }, process.env.JWT_SECRET);
     res.json({ token });

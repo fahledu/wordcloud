@@ -17,7 +17,7 @@ router.get("/:groupName", async (req, res) => {
     const group = await pool.query("SELECT id FROM groups WHERE name = $1", [req.params.groupName]);
     if (!group.rows.length) return res.status(404).json({ error: "Grupo não encontrado" });
 
-    const words = await pool.query("SELECT word FROM words WHERE grouo_id = $1", [group.rows[0].id]);
+    const words = await pool.query("SELECT word FROM words WHERE group_id = $1", [group.rows[0].id]);
     res.json(words.rows);
 });
 
