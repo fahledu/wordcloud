@@ -1,47 +1,36 @@
 const express = require("express");
+const db = require("../db");
+const authenticate = require("../middleware/auth");
 const router = express.Router();
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
-const pool = require("../db");
-const auth = require("../middleware/auth");
 
-// Criar grupo
-router.post("/", async (req, res) => {
-    const { name, password } = req.body;
-    const hash = await bcrypt.hash(password, 10);
-    const result = await pool.query(
-        "INSERT INTO groups (name, password) VALUES ($1, $2) RETURNING id",
-        [name, hash]
-    );
-    res.json({ groupId: result.rows[0].id });
+// Listar todos os grupos
+router.get("/", authenticate, async (req, res) => {
+  const result = await db.query("SELECT * FROM groups ORDER BY id DESC");
+  res.json(result.rows);
 });
 
-// Login grupo
-router.post("/login", async (req, res) => {
-    const { name, password } = req.body;
-    const result = await pool.query("SELECT * FROM groups WHERE name = $1", [name]);
-    const group = result.rows[0];
-    if (!group) return res.status(404).json({ error: "Grupo não encontrado" });
+// Criar novo grupo
+router.post("/", authenticate, async (req, res) => {
+  const { name } = req.body;
+  if (!name) return res.status(400).json({ error: "Nome é obrigatório" });
 
-    const match = await bcrypt.compare(password, group.password);
-    if (!match) return res.status(401).json({ error: "Senha incorreta" });
-
-    const token = jwt.sign({ groupId: group.id }, process.env.JWT_SECRET);
-    res.json({ token });
+  await db.query("INSERT INTO groups (name) VALUES ($1)", [name]);
+  res.status(201).json({ message: "Grupo criado" });
 });
 
 // Editar grupo
-router.put("/:id", auth, async (req, res) => {
-    const { name, password } = req.body;
-    const hash = await bcrypt.hash(password, 10);
-    await pool.query("UPDATE groups SET name = $1, password = $2 WHERE id = $3", [name, hash, req.params.id]);
-    res.sendStatus(200);
+router.put("/:id", authenticate, async (req, res) => {
+  const { name } = req.body;
+  if (!name) return res.status(400).json({ error: "Nome é obrigatório" });
+
+  await db.query("UPDATE groups SET name = $1 WHERE id = $2", [name, req.params.id]);
+  res.status(200).json({ message: "Grupo atualizado" });
 });
 
 // Deletar grupo
-router.delete("/:id", auth, async (req, res) => {
-    await pool.query("DELETE FROM groups WHERE id = $1", [req.params.id]);
-    res.sendStatus(200);
+router.delete("/:id", authenticate, async (req, res) => {
+  await db.query("DELETE FROM groups WHERE id = $1", [req.params.id]);
+  res.sendStatus(204);
 });
 
-module.exports = router
+module.exports = router;

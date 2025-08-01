@@ -7,9 +7,11 @@ app.use(cors());
 app.use(express.json());
 
 // Importar rotas
+const authRoutes = require("./routes/auth");
 const groupRoutes = require("./routes/groups");
 const wordRoutes = require("./routes/words");
 
+app.use("/auth", authRoutes);
 app.use("/groups", groupRoutes);
 app.use("/words", wordRoutes);
 
