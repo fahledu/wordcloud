@@ -3,15 +3,15 @@ import { useNavigate } from "react-router-dom";
 import API from "../api";
 
 function LoginPage() {
-    const [name, setName] = useState("");
+    const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const navigate = useNavigate();
 
     const login = async () => {
         try {
-            const res = await API.post("groups/login", { name, password });
+            const res = await API.post("/auth/login", { email, password });
             localStorage.setItem("token", res.data.token);
-            navigate("dashboard");
+            navigate("/dashboard");
         } catch (err) {
             alert("Erros ao fazer login. Nome ou senha invalidos");
         }
@@ -21,9 +21,9 @@ function LoginPage() {
         <div>
             <h2>Login do Grupo</h2>
             <input
-                placeholder="Nome do grupo"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
+                placeholder="E-mail"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
             />
             <input
                 placeholder="Senha"
