@@ -2,30 +2,35 @@
 
 Sistema de nuvem de palavras segregada por grupos. Cada grupo possui uma URL exclusiva onde usuários podem visualizar e enviar palavras. A criação e gerenciamento de grupos é autenticada via JWT.
 
+---
 
-🧩 Tecnologias
-- Frontend: React (com rotas e Axios)
+## 🧩 Tecnologias
+- Frontend: React (com rotas, axios, react-wordcloud)
 - Backend: Node.js + Express
 - Banco de Dados: PostgreSQL
 - Autenticação: JWT
 - Deploy:
-    - Frontend: Vercel
-    - Backend: Railway
+  - Frontend: Vercel
+  - Backend: Railway
+
+---
 
 ## 🛠️ ETAPA 1 — Banco de Dados (PostgreSQL)
 
-Tabela de grupos
 ```sql
-CREATE TABLE groups (
+CREATE TABLE users (
   id SERIAL PRIMARY KEY,
-  name VARCHAR(255) NOT NULL UNIQUE,
+  email VARCHAR(255) UNIQUE NOT NULL,
   password VARCHAR(255) NOT NULL,
   created_at TIMESTAMP DEFAULT NOW()
 );
-```
 
-Tabela de palavras
-```sql
+CREATE TABLE groups (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(255) NOT NULL UNIQUE,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
 CREATE TABLE words (
   id SERIAL PRIMARY KEY,
   group_id INTEGER REFERENCES groups(id) ON DELETE CASCADE,
@@ -33,91 +38,125 @@ CREATE TABLE words (
   created_at TIMESTAMP DEFAULT NOW()
 );
 ```
-💡 Use o console SQL da Railway ou ferramentas como DBeaver ou PgAdmin para executar os comandos.
+
+---
 
 ## ⚙️ ETAPA 2 — Backend com Node.js + Express
 
-Estrutura de pastas
+Estrutura de pastas:
 
-```bash
+```
 /backend
-  /controllers
   /routes
+    auth.js
+    groups.js
+    words.js
   /middleware
-  app.js
+    auth.js
   db.js
+  app.js
   .env
 ```
 
-Instalar dependências
+Dependências:
+
 ```bash
 npm install express cors pg bcrypt jsonwebtoken dotenv
 ```
 
-Explicações das dependências
-- express: servidor web rápido e minimalista
-- cors: permite acesso do frontend (CORS headers)
-- pg: cliente para conexão com PostgreSQL
-- bcrypt: criptografia de senhas
-- jsonwebtoken: geração e verificação de tokens JWT
-- dotenv: carrega variáveis de ambiente do .env
+`.env` exemplo:
 
-Arquivo .env (exemplo)
 ```env
 PORT=4000
 DATABASE_URL=postgresql://usuario:senha@host:porta/dbname
-JWT_SECRET=sua_chave_secreta
+JWT_SECRET=sua_chave_super_secreta
 ```
 
-## 🌐 ETAPA 3 — Frontend com React
-```bash
+---
+
+### ✨ Rotas protegidas com autenticação
+
+- `POST /auth/register` — Criação de usuário
+- `POST /auth/login` — Retorna token JWT
+- `GET /groups` — Listar grupos (privado)
+- `POST /groups` — Criar grupo (privado)
+- `PUT /groups/:id` — Editar grupo (privado)
+- `DELETE /groups/:id` — Excluir grupo (privado)
+
+---
+
+### 🌐 Rotas públicas
+
+- `GET /words/:groupName` — Listar palavras do grupo
+- `POST /words/:groupName` — Adicionar palavra à nuvem
+
+---
+
+## 💻 ETAPA 3 — Frontend com React
+
+Estrutura de pastas:
+
+```
 /frontend
-  /pages
-    /login
-    /dashboard
-    /group/[groupName] (público)
+  /src
+    /pages
+      LoginPage.jsx
+      Dashboard.jsx
+      GroupCloud.jsx       # Visualizar nuvem
+      WordForm.jsx         # Enviar palavra
+    /components
+      ProtectedRoute.jsx
+    api.js
+    App.jsx
+  .env
 ```
 
-Instalar dependências
-```bash
-npm install axios react-router-dom
-```
-
-Explicações:
-- axios: biblioteca para fazer requisições HTTP de forma simples (GET, POST, etc.)
-- react-router-dom: biblioteca de rotas SPA (Single Page Application)
-
-## 🔗 URL exclusiva por grupo
-Cada grupo possui uma rota pública com a nuvem de palavras acessível por qualquer pessoa:
+Dependências:
 
 ```bash
-https://seuapp.vercel.app/group/<nome-do-grupo>
+npm install axios react-router-dom react-d3-cloud d3 d3-cloud --legacy-peer-deps
 ```
 
-## 🚀 Deploy
-
-### Backend (Railway)
-
-1. Crie projeto no Railway
-2. Provision PostgreSQL
-3. Copie a DATABASE_URL
-4. Conecte ao GitHub e deploye seu projeto
-5. Configure .env com as variáveis do backend
-
-### Frontend (Vercel)
-
-1. Suba o frontend no GitHub
-2. Importe para Vercel
-3. Configure variável de ambiente:
+Variáveis de ambiente:
 
 ```env
 REACT_APP_API_URL=https://SEU_BACKEND.railway.app
 ```
 
+---
+
+## 🔗 URLs por grupo
+
+- Visualização pública:  
+  `https://seuapp.vercel.app/group/NOME_DO_GRUPO`
+
+- Envio de palavras:  
+  `https://seuapp.vercel.app/group/NOME_DO_GRUPO/submit`
+
+---
+
+## 🚀 Deploy
+
+### Backend (Railway)
+
+1. Crie projeto
+2. Adicione PostgreSQL
+3. Copie a `DATABASE_URL`
+4. Faça deploy do repositório
+5. Configure `.env` com `DATABASE_URL` e `JWT_SECRET`
+
+### Frontend (Vercel)
+
+1. Suba no GitHub
+2. Importe no Vercel
+3. Configure `REACT_APP_API_URL` com a URL pública do Railway
+
+---
+
 ## ✅ Funcionalidades
 
-- 🔒 Criar/Login de grupo com senha (JWT)
-- 🌐 Visualização pública de nuvem por grupo
+- 🔐 Login com email e senha (JWT)
+- 📋 CRUD de grupos autenticado
+- 🌐 Visualização pública da nuvem
 - ➕ Envio de palavras sem login
-- 🛡️ Cada grupo isolado (não vê palavras de outros)
-- 🧠 Interface simples, didática e funcional
+- 🎨 Nuvem com visual interativo usando `react-wordcloud`
