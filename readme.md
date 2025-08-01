@@ -159,4 +159,4 @@ REACT_APP_API_URL=https://SEU_BACKEND.railway.app
 - 📋 CRUD de grupos autenticado
 - 🌐 Visualização pública da nuvem
 - ➕ Envio de palavras sem login
-- 🎨 Nuvem com visual interativo usando `react-wordcloud`
+- 🎨 Nuvem com visual interativo usando `react-d3-cloud`
