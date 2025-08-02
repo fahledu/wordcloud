@@ -1,36 +1,11 @@
 const express = require("express");
-const db = require("../db");
 const authenticate = require("../middleware/auth");
 const router = express.Router();
+const groupController = require("../controllers/groupController")
 
-// Listar todos os grupos
-router.get("/", authenticate, async (req, res) => {
-  const result = await db.query("SELECT * FROM groups ORDER BY id DESC");
-  res.json(result.rows);
-});
-
-// Criar novo grupo
-router.post("/", authenticate, async (req, res) => {
-  const { name } = req.body;
-  if (!name) return res.status(400).json({ error: "Nome é obrigatório" });
-
-  await db.query("INSERT INTO groups (name) VALUES ($1)", [name]);
-  res.status(201).json({ message: "Grupo criado" });
-});
-
-// Editar grupo
-router.put("/:id", authenticate, async (req, res) => {
-  const { name } = req.body;
-  if (!name) return res.status(400).json({ error: "Nome é obrigatório" });
-
-  await db.query("UPDATE groups SET name = $1 WHERE id = $2", [name, req.params.id]);
-  res.status(200).json({ message: "Grupo atualizado" });
-});
-
-// Deletar grupo
-router.delete("/:id", authenticate, async (req, res) => {
-  await db.query("DELETE FROM groups WHERE id = $1", [req.params.id]);
-  res.sendStatus(204);
-});
+router.get("/", authenticate, groupController.listGroups);
+router.post("/", authenticate, groupController.newGroup);
+router.put("/:id", authenticate, groupController.editGroup);
+router.delete("/:id", authenticate, groupController.deleteGroup);
 
 module.exports = router;
