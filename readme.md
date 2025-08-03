@@ -1,3 +1,4 @@
+
 # 💬 Word Cloud App por Grupo
 
 Sistema de nuvem de palavras segregada por grupos. Cada grupo possui uma URL exclusiva onde usuários podem visualizar e enviar palavras. A criação e gerenciamento de grupos é autenticada via JWT.
@@ -5,6 +6,7 @@ Sistema de nuvem de palavras segregada por grupos. Cada grupo possui uma URL exc
 ---
 
 ## 🧩 Tecnologias
+
 - Frontend: React (com rotas, axios, react-wordcloud)
 - Backend: Node.js + Express
 - Banco de Dados: PostgreSQL
@@ -12,10 +14,13 @@ Sistema de nuvem de palavras segregada por grupos. Cada grupo possui uma URL exc
 - Deploy:
   - Frontend: Vercel
   - Backend: Railway
+- Contêinerização: Docker, Docker Compose
 
 ---
 
 ## 🛠️ ETAPA 1 — Banco de Dados (PostgreSQL)
+
+> **Nota:** O `docker-compose` já cria o banco e executa as tabelas automaticamente via script.
 
 ```sql
 CREATE TABLE users (
@@ -43,38 +48,23 @@ CREATE TABLE words (
 
 ## ⚙️ ETAPA 2 — Backend com Node.js + Express
 
-Estrutura de pastas:
-
-```
-/backend
-  /routes
-    auth.js
-    groups.js
-    words.js
-  /middleware
-    auth.js
-  db.js
-  app.js
-  .env
-```
-
-Dependências:
+### Dependências:
 
 ```bash
 npm install express cors pg bcrypt jsonwebtoken dotenv
 ```
 
-`.env` exemplo:
+### `.env` exemplo:
 
 ```env
-PORT=4000
+PORT=3001
 DATABASE_URL=postgresql://usuario:senha@host:porta/dbname
 JWT_SECRET=sua_chave_super_secreta
 ```
 
 ---
 
-### ✨ Rotas protegidas com autenticação
+### ✨ Rotas protegidas (autenticadas)
 
 - `POST /auth/register` — Criação de usuário
 - `POST /auth/login` — Retorna token JWT
@@ -94,33 +84,18 @@ JWT_SECRET=sua_chave_super_secreta
 
 ## 💻 ETAPA 3 — Frontend com React
 
-Estrutura de pastas:
-
-```
-/frontend
-  /src
-    /pages
-      LoginPage.jsx
-      Dashboard.jsx
-      GroupCloud.jsx       # Visualizar nuvem
-      WordForm.jsx         # Enviar palavra
-    /components
-      ProtectedRoute.jsx
-    api.js
-    App.jsx
-  .env
-```
-
-Dependências:
+### Dependências:
 
 ```bash
 npm install axios react-router-dom react-d3-cloud d3 d3-cloud --legacy-peer-deps
 ```
 
-Variáveis de ambiente:
+> **Nota:** A flag `--legacy-peer-deps` é usada para forçar a compatibilidade do `react-d3-cloud` com React 19. Caso prefira usar React 18, não é necessário usar essa flag.
+
+### Variáveis de ambiente:
 
 ```env
-REACT_APP_API_URL=https://SEU_BACKEND.railway.app
+REACT_APP_API_URL=http://localhost:3001
 ```
 
 ---
@@ -128,10 +103,28 @@ REACT_APP_API_URL=https://SEU_BACKEND.railway.app
 ## 🔗 URLs por grupo
 
 - Visualização pública:  
-  `https://seuapp.vercel.app/group/NOME_DO_GRUPO`
+  `http://localhost:3000/group/NOME_DO_GRUPO`
 
 - Envio de palavras:  
-  `https://seuapp.vercel.app/group/NOME_DO_GRUPO/submit`
+  `http://localhost:3000/group/NOME_DO_GRUPO/submit`
+
+---
+
+## 🐳 ETAPA 4 — Rodando com Docker
+
+1. Certifique-se de ter Docker e Docker Compose instalados.
+2. Configure os arquivos `.env` no backend e frontend com as variáveis necessárias.
+3. Na raiz do projeto (onde está o `docker-compose.yml`), rode:
+
+```bash
+docker-compose up --build
+```
+
+4. Acesse as aplicações:
+
+- Frontend: [http://localhost:3000](http://localhost:3000)  
+- Backend API: [http://localhost:3001](http://localhost:3001)  
+- PostgreSQL: `localhost:5432` (use um cliente PostgreSQL para acessar, se desejar)
 
 ---
 
@@ -139,17 +132,17 @@ REACT_APP_API_URL=https://SEU_BACKEND.railway.app
 
 ### Backend (Railway)
 
-1. Crie projeto
-2. Adicione PostgreSQL
-3. Copie a `DATABASE_URL`
-4. Faça deploy do repositório
-5. Configure `.env` com `DATABASE_URL` e `JWT_SECRET`
+1. Crie um projeto no Railway.
+2. Adicione o plugin PostgreSQL.
+3. Copie a variável `DATABASE_URL`.
+4. Faça deploy do repositório.
+5. Configure o arquivo `.env` no Railway com `DATABASE_URL` e `JWT_SECRET`.
 
 ### Frontend (Vercel)
 
-1. Suba no GitHub
-2. Importe no Vercel
-3. Configure `REACT_APP_API_URL` com a URL pública do Railway
+1. Suba o código no GitHub.
+2. Importe o projeto no Vercel.
+3. Configure a variável `REACT_APP_API_URL` com a URL pública do backend no Railway.
 
 ---
 
@@ -160,3 +153,7 @@ REACT_APP_API_URL=https://SEU_BACKEND.railway.app
 - 🌐 Visualização pública da nuvem
 - ➕ Envio de palavras sem login
 - 🎨 Nuvem com visual interativo usando `react-d3-cloud`
+
+---
+
+Se quiser, posso ajudar a revisar outras partes do projeto ou criar exemplos de código. Só avisar!
