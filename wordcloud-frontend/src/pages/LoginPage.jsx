@@ -18,8 +18,8 @@ function LoginPage() {
     };
 
     return (
-        <div>
-            <h2>Login do Grupo</h2>
+        <div style={{textAlign: "center"}}>
+            <h2>Login</h2>
             <input
                 placeholder="E-mail"
                 value={email}
