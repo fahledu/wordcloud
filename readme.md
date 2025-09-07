@@ -61,7 +61,7 @@ DATABASE_URL=postgresql://postgres:postgres@db:5432/wordcloud
 JWT_SECRET=sua_chave_super_secreta
 ```
 
-> **Nota:** Você pode gerar uma chave JWT com:
+> **Nota:** Você pode gerar uma chave JWT executando no terminal:
 
 ```bash
 openssl rand -hex 32
@@ -119,6 +119,8 @@ CREATE TABLE words (
 
 ### Dependências
 
+> **Nota:** Ao subir o container já é instalado as dependencias via Dockerfile RUN npm install.
+
 ```bash
 npm install express cors pg bcrypt jsonwebtoken dotenv
 ```
@@ -147,6 +149,8 @@ Grupos:
 ## 💻 Frontend com React
 
 ### Dependências
+
+> **Nota:** Ao subir o container já é instalado as dependencias via Dockerfile RUN npm install.
 
 ```bash
 npm install axios react-router-dom react-d3-cloud d3 d3-cloud --legacy-peer-deps
