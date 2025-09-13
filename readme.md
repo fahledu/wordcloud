@@ -158,11 +158,6 @@ npm install axios react-router-dom react-d3-cloud d3 d3-cloud --legacy-peer-deps
 
 > **Nota:** A flag `--legacy-peer-deps` é usada para forçar a compatibilidade do `react-d3-cloud` com React 19.
 
-### Variáveis de ambiente
-
-```env
-REACT_APP_API_URL=http://localhost:3001
-```
 
 ---
 
